@@ -38,6 +38,13 @@
   (rex-leader
     "ot" 'vterm)
   :commands vterm)
+(use-package multi-vterm
+  :ensure t
+  :general
+  (rex-leader
+    "mt" 'multi-vterm
+    "mp" 'multi-vterm-prev
+    "mn" 'multi-vterm-next))
 
 (use-package eat
   :elpaca (:host codeberg :repo "akib/emacs-eat" :files (:defaults "./*")))
@@ -182,8 +189,6 @@
   :config
   (setq treemacs-wrap-around nil)
   :commands 'treemacs)
-
-(use-package treemacs-evil)
 
 (use-package hide-mode-line)
 

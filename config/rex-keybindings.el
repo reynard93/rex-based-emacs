@@ -12,10 +12,8 @@
   :config
   (general-override-mode)
   (general-create-definer rex-leader
-    :states '(normal visual insert emacs)
     :keymaps 'override
-    :prefix "SPC"
-    :non-normal-prefix "C-SPC")
+    :prefix "C-.")
   (rex-leader
     "m" '(:ignore t :which-key "local leader")
     "s" '(:ignore t :which-key "search")

@@ -161,8 +161,8 @@
   (:keymaps 'vertico-map
             "M-d" 'consult-dir))
 
-(use-package consult-eglot
-  :after eglot
-  :general
-  (rex-leader
-    "cs" 'consult-eglot-symbols))
+;; (use-package consult-eglot
+;;   :after eglot
+;;   :general
+;;   (rex-leader
+;;     "cs" 'consult-eglot-symbols))

@@ -3,10 +3,25 @@
 ;; General programming utilities / settings
 ;; ****************************************
 ;; TODO: set up the integrated version
-(use-package tree-sitter
-  :diminish tree-sitter-mode)
+;; (use-package tree-sitter
+;;   :diminish tree-sitter-mode)
+;; (use-package tree-sitter-langs)
+(use-package emacs
+  :elpaca nil
+  :init
+  (setq treesit-font-lock-level 4)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+  )
+(use-package treesit-auto
+  :elpaca (:host github :repo "renzmann/treesit-auto")
+  :config (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode))
 
-(use-package tree-sitter-langs)
+(use-package flycheck
+  :hook ((prog-mode . flycheck-mode))
+  :config
+  (setq flycheck-check-syntax-automatically '(save mode-enabled newline))
+  (setq flycheck-display-errors-delay 0.1))
 
 (use-package flymake :elpaca nil
   :init
@@ -16,7 +31,9 @@
         '(" " flymake-mode-line-exception flymake-mode-line-counters))
   :general
   (rex-leader
-    "tf" 'flymake-mode))
+    "tf" 'flymake-mode
+    "fe" 'flycheck-list-errors
+    ))
 
 (use-package emacs :elpaca nil
   :hook (after-save . executable-make-buffer-file-executable-if-script-p))
@@ -108,29 +125,20 @@
             "C-j" 'rex/eldoc-box-scroll-down
             "M-h" 'eldoc-box-help-at-point))
 
-;; Language config
+;; Language config EGLOT
 ;; ****************************************
-(use-package c-mode :elpaca nil
-  :ensure nil
-  :hook
-  (c-mode . eglot-ensure)
-  (c-mode . tree-sitter-hl-mode)
-  :hook (c-mode . (lambda () (setq c-basic-offset 4))))
-
-(use-package java-mode :elpaca nil
-  :ensure nil
-  :hook
-  (java-mode . eglot-ensure)
-  (java-mode . tree-sitter-hl-mode)
-  (java-mode . (lambda () (cl-defmethod eglot-execute-command
-                            (_server (_cmd (eql java.apply.workspaceEdit)) arguments)
-                            "Eclipse JDT breaks spec and replies with edits as arguments."
-                            (mapc #'eglot--apply-workspace-edit arguments)))))
+;; (use-package java-mode :elpaca nil
+;;   :ensure nil
+;;   :hook
+;;   (java-mode . eglot-ensure)
+;;   (java-mode . (lambda () (cl-defmethod eglot-execute-command
+;;                             (_server (_cmd (eql java.apply.workspaceEdit)) arguments)
+;;                             "Eclipse JDT breaks spec and replies with edits as arguments."
+;;                             (mapc #'eglot--apply-workspace-edit arguments)))))
 
 (use-package php-mode
   :hook
   (php-mode . eglot-ensure)
-  (php-mode . tree-sitter-hl-mode)
   :general
   (:keymaps '(normal php-mode)
             "gr" 'xref-find-references))
@@ -157,7 +165,19 @@
 (use-package web-mode
   :mode
   ("\\.html$" . web-mode)
-  ("\\.twig$" . web-mode))
+  ("\\.twig$" . web-mode)
+  ("\\.vue$" . web-mode)
+  :config
+  (setq web-mode-code-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-markup-indent-offset 2
+        web-mode-sql-indent-offset 2
+        web-mode-script-padding 0       ; start script in col 0
+        web-mode-enable-current-column-highlight t
+        )
+  :hook
+  (web-mode . (lambda () (electric-indent-local-mode -1)))
+)
 
 (use-package nxml-mode :elpaca nil
   :ensure nil
@@ -172,41 +192,68 @@
 (use-package js
   :elpaca nil
   :ensure nil
-  :hook
-  (js-mode . tree-sitter-hl-mode)
   :mode ("\\.js$" . js-mode))
 
 (use-package typescript-mode
-  :hook
-  (typescript-mode . tree-sitter-hl-mode)
-  :mode ("\\.ts$" . typescript-mode))
+  :mode(
+  "\\.ts$" . typescript-mode))
 
- (use-package emacs :elpaca nil
-  :after eglot
+;; https://ianyepan.github.io/posts/emacs-ide/
+(use-package lsp-mode
   :init
-  (define-derived-mode rex/vue-mode web-mode "rex/vue"
-    "A major mode derived from web-mode, for editing .vue files with LSP support.")
-  (add-to-list 'eglot-server-programs '(rex/vue-mode "vls"))
-  :mode ("\\.vue\\'" . rex/vue-mode)
-  :hook
-  (rex/vue-mode . eglot-ensure)
-  (rex/vue-mode . (lambda () (electric-indent-local-mode -1))))
-
-(use-package emacs :elpaca nil
-  :hook
-  (TeX-mode . display-line-numbers-mode)
-  (TeX-mode . visual-line-mode)
+  (defun ii/lsp-mode-setup-completion()
+  (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+        '(orderless)))
+  :hook (
+         ((c-mode          ; clangd
+          c++-mode        ; clangd
+          c-or-c++-mode   ; clangd
+          java-mode       ; eclipse-jdtls
+          js-mode         ; ts-ls (tsserver wrapper)
+          js-jsx-mode     ; ts-ls (tsserver wrapper)
+          typescript-mode ; ts-ls (tsserver wrapper)
+          python-mode     ; pyright
+          web-mode        ; ts-ls/HTML/CSS
+          haskell-mode    ; haskell-language-server
+          ) . lsp-deferred)
+         (lsp-completion-mode . ii/lsp-mode-setup-completion)
+         )
+  :commands lsp
   :config
-  (setq tex-start-options "--shell-escape"))
+  (setq lsp-auto-guess-root t)
+  (setq lsp-log-io nil)
+  (setq lsp-restart 'auto-restart)
+  (setq lsp-enable-symbol-highlighting nil)
+  (setq lsp-enable-on-type-formatting nil)
+  (setq lsp-signature-auto-activate nil)
+  (setq lsp-signature-render-documentation nil)
+  (setq lsp-eldoc-hook nil)
+  (setq lsp-modeline-code-actions-enable nil)
+  (setq lsp-modeline-diagnostics-enable nil)
+  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-semantic-tokens-enable nil)
+  (setq lsp-enable-folding nil)
+  (setq lsp-enable-imenu nil)
+  (setq lsp-enable-snippet nil)
+  (setq read-process-output-max (* 1024 1024)) ;; 1MB
+  (setq lsp-prefer-capf t) ; prefer lsp's company-capf over company-lsp
+ ;; (add-to-list 'lsp-language-id-configuration '(js-jsx)
+  (setq lsp-idle-delay 0.5)
+  (setq lsp-completion-provider :none)
+  :general (rex-leader
+    "cf" 'lsp-format-buffer
+    "cd" 'lsp-find-declaration
+    "cD" 'lsp-find-implementation
+    "cr" 'lsp-rename
+    "ca" 'lsp-code-actions)
+  )
 
-;; LaTeX
-;; ****************************************
-(use-package auctex
-  :mode ("\\.tex\\'" . LaTeX-mode))
-
-(use-package auctex-latexmk
-  :hook (LaTeX-mode . (lambda () (setq TeX-command-default "LatexMk")))
-  :init
-  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+(use-package lsp-ui
   :config
-  (auctex-latexmk-setup))
+  (setq lsp-ui-doc-enable nil)
+  (setq lsp-ui-peek-enable t)
+  (setq lsp-ui-doc-header t)
+  (setq lsp-ui-doc-include-signature t)
+  (setq lsp-ui-doc-border (face-foreground 'default))
+  (setq lsp-ui-sideline-show-code-actions t)
+  (setq lsp-ui-sideline-delay 0.05))

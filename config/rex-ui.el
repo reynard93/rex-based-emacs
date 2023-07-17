@@ -8,7 +8,7 @@
    ((t ( :inherit nil
          :inherit font-lock-function-name-face)))))
 
-;; Huge theme pack 
+;; Huge theme pack
 (use-package doom-themes
   :custom-face
   (line-number
@@ -23,7 +23,6 @@
 ;; Flashy modeline
 (use-package moody
   :config
-  (setq evil-mode-line-format '(before . moody-mode-line-buffer-identification))
   (setq x-underline-at-descent-line t)
   (setq moody-mode-line-height 38)
   (moody-replace-mode-line-buffer-identification)
@@ -39,6 +38,12 @@
    ((t ( :foreground unspecified
          :inherit font-lock-type-face)))))
 
+(use-package all-the-icons-completion
+  :ensure t
+  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+  :init
+  (all-the-icons-completion-mode))
+
 ;; Show the results of C-x C-e directly in the buffer
 (use-package eros
   :config
@@ -48,30 +53,6 @@
   (eros-result-overlay-face
    ((t ( :box nil
          :inverse-video t)))))
-
-;; Briefly flash current line after a long movement.
-(use-package pulsar
-  :demand t
-  :after evil
-  :init
-  (setq pulsar-face 'pulsar-generic)
-  :custom-face
-  (pulsar-generic
-   ((t ( :background unspecified
-         :inherit region))))
-  :config
-  (setq pulsar-functions
-        '(evil-window-down
-          evil-window-up
-          evil-window-right
-          evil-window-left
-          evil-avy-goto-char-timer
-          other-window
-          isearch-repeat-forward
-          isearch-repeat-backward))
-  (dolist (fkt pulsar-functions)
-    (add-to-list 'pulsar-pulse-functions fkt))
-  (pulsar-global-mode))
 
 ;; Highlight hex color strings (and some other kinds) in the buffer
 (use-package rainbow-mode
@@ -123,3 +104,9 @@
   :hook
   (prog-mode . diff-hl-mode)
   (diff-hl-mode . rex/diff-hl-settings-apply))
+
+(use-package highlight-indent-guides
+  :ensure t
+  :custom
+  ((highlight-indent-guides-responsive 'top)
+   (highlight-indent-guides-method 'character)))

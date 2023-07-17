@@ -47,6 +47,7 @@ Resize: _h_: left  _j_: down  _k_: up  _l_: right "
     ("q" nil                           ))
 
   (setq hydra--work-around-dedicated nil)
+  (setq hydra-hint-display-delay nil)
   (hydra-set-property '+hydra/window-nav :verbosity 0)
 
   (defhydra unpackaged/smerge-hydra

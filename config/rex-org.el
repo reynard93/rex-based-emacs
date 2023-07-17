@@ -131,20 +131,8 @@
             "C-j" '(lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1)))
             "C-k" '(lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1)))
             "C-l" '(lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
-  (:states 'normal
-   :keymaps 'org-agenda-mode-map
-            "R" 'rex/reload-agenda
-            "q" 'org-agenda-quit
-            "RET" 'org-agenda-goto
-            "K" 'org-habit-toggle-display-in-agenda)
   (:keymaps 'org-src-mode-map
             "C-c C-c" 'org-edit-src-exit)
-  (:states 'normal
-   :keymaps 'org-mode-map
-            "RET" 'rex/org-dwim-at-point)
-  (:states 'insert
-   :keymaps 'org-mode-map
-            "C-o" 'evil-org-open-below)
   (rex-leader
     "ma" 'rex/agenda
     "ml" 'org-store-link)
@@ -162,23 +150,6 @@
 (use-package org-contrib
   :config
   (setq org-eldoc-breadcrumb-separator "::"))
-
-(use-package evil-org
-  :diminish evil-org-mode
-  :general
-  (:states 'normal
-   :keymaps 'org-agenda-mode-map
-            "k" 'org-agenda-previous-line
-            "j" 'org-agenda-next-line)
-  (:keymaps 'evil-inner-text-objects-map
-            "e" 'evil-org-inner-object
-            "E" 'evil-org-inner-element
-            "r" 'evil-org-inner-greater-element
-            "R" 'evil-org-inner-subtree)
-  :config (defun rex/start-evil-org-mode ()
-            (evil-org-mode))
-  :after org
-  :hook (org-mode . rex/start-evil-org-mode))
 
 (use-package org-superstar
   :hook (org-mode . (lambda () (org-superstar-mode 1)))

@@ -55,9 +55,7 @@
 ;; simpler. Installing it here and configuring it later keeps this file simpler.
 (use-package general
   :demand t
-  :config
-  (general-auto-unbind-keys)
-  (general-evil-setup t))
+)
 
 ;; Necessary after installing packages that add keywords to use-package
 (elpaca-wait)

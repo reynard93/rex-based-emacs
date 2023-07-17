@@ -37,9 +37,6 @@
   ;; Set up the keymap tree.
   (load "rex-keybindings")
 
-  ;; Modal editing.
-  (load "rex-evil")
-
   ;; Hydra lets you create keymap menus
   (load "rex-hydra")
 
@@ -72,7 +69,7 @@
   (load "rex-hacks")
 
   ;; mu4e
-  (load "~/build/rex-email/rex-email")
+  ;;(load "~/build/rex-email/rex-email")
 
   ;; restore gc-cons-threshold
   (setq gc-cons-threshold 800000))
