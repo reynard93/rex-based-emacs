@@ -55,7 +55,7 @@
 ;; what exactly you're matching on in a string.
 (use-package orderless
   :init
-  (setq completion-styles '(orderless basic))
+  (setq completion-styles '(orderless partial-completion basic))
   (setq completion-category-defaults nil)
   (setq completion-category-overrides '((file) (styles partial-completion))))
 

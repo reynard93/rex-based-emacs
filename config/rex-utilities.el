@@ -209,4 +209,11 @@
   (rex-leader
     "sD" 'deadgrep))
 
+(use-package gcmh
+  ;; :hook (emacs-startup-hook . gcmh-mode)
+  :demand t
+  :config
+  (setq gcmh-low-cons-threshold (* 16 1024 1024))
+  (gcmh-mode +1))
+
 (use-package wgrep-deadgrep)

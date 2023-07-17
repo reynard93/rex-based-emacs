@@ -23,6 +23,7 @@
   (setq use-package-always-ensure t)
   (setq frame-resize-pixelwise t)
   (setq custom-theme-directory (concat user-emacs-directory "themes/"))
+  (add-to-list 'treesit-extra-load-path (concat user-emacs-directory "tree-sitter/dist/"))
   (setq inhibit-x-resources t)
   :custom-face
   (cursor
